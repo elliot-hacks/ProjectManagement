@@ -17,6 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'admin_tools',
+    'admin_tools.dashboard',
+    'admin_tools.menu',
+    'admin_tools.theming',
+    'admin_tools.utils',
     'projects',
     'channels',
     'schedule',
@@ -103,3 +108,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+
+# TEMPLATE_CONTEXT_PROCESSORS += (
+#     "django.core.context_processors.request",
+# )

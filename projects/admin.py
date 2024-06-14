@@ -84,6 +84,17 @@ class OfficeAdmin(admin.ModelAdmin):
 
 
 
+# Custom dashbord for every user
+# from admin_tools.dashboard import modules
+# from admin_tools.dashboard.models import DashboardPreferences
+# from admin_tools.utils import get_admin_site
+
+# from .dashboard import CustomIndexDashboard, MyAppDashboard
+
+# admin.site.unregister(DashboardPreferences)
+
+
+
 # To be implemented if there is confict of one group deleting user from other group of superior priveledges
 """
 from django.contrib import admin

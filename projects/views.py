@@ -259,6 +259,12 @@ def project_report(request, project_id):
     return response
 
 
+
+
+
+
+
+
 # Signals
 @receiver(post_save, sender=Task)
 def send_task_notification(sender, instance, created, **kwargs):
@@ -287,4 +293,3 @@ def log_task_deletion(sender, instance, **kwargs):
         object_id=instance.id,
         description=f'Deleted task: {instance.name}'
     )
-

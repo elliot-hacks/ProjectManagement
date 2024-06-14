@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.utils import timezone
 from .models import Project, Task, Division, Ward, Village, Office
-from .forms import UserRegistrationForm, ProjectForm, TaskForm  # Assuming these forms are defined
+from .forms import UserRegistrationForm, ProjectForm, TaskForm
+
 
 @login_required(login_url='login')
 def index(request):
@@ -35,7 +37,11 @@ def u_login(request):
 def about(request):
     return render(request, 'about.html')
 
-# Additional Views for Projects and Tasks
+
+def custom_logout(request):
+    logout(request)
+    return redirect(reverse('login'))
+
 
 @login_required(login_url='login')
 def project_detail(request, project_id):

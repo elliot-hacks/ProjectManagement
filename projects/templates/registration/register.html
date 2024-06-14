@@ -4,7 +4,7 @@
     <div class="wrapper">
         <div class="container-fluid">
             <div class="form-box">
-                <h1 style="text-align:center;">Hotelini Sign Up</h1>
+                <h1 style="text-align:center;">PM Sign Up</h1>
                     {% if messages %}
                     {% for message in messages %}
                      <p>{{ message }}</p>
@@ -17,11 +17,12 @@
                                     {% csrf_token %}
                                     {{ form.as_p }}
                                     <input type="submit"/>
+                                    <a href="{% url 'login' %}" class="nav-item nav-link active">Arleady Registered, Login</a>
                                 </form>
                             </div>
                         </div>
                 </div>
             </div>
         </div>
-    </br></br></br></br></br></br></br>
+    
 {% endblock %}

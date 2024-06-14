@@ -4,7 +4,7 @@
     <div class="wrapper">
         <div class="container-fluid">
             <div class="form-box">
-                <h1 style="text-align:center;">Hotelini Login</h1>
+                <h1 style="text-align:center;">Project Management Login</h1>
                 {% if messages %}
                 {% for message in messages %}
                 <p>{{ message }}</p>
@@ -17,6 +17,7 @@
                                 {% csrf_token %}
                                 {{ form.as_p }}
                                 <input type="submit"/>
+                                <a href="{% url 'register' %}" class="nav-item nav-link active">Not Registered, Register</a>
                             </form>
                         </div>
                     </div>

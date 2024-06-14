@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Division(models.Model):
@@ -81,3 +83,13 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.project.name})"
+
+
+# For logging all activities
+class ActivityLog(models.Model):
+    action = models.CharField(max_length=50)
+    description = models.TextField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    timestamp = models.DateTimeField(auto_now_add=True)

@@ -1,8 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models.signals import post_save, pre_delete
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.dispatch import receiver
 from django.contrib import messages
 from django.utils import timezone
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+import plotly.graph_objects as go
+from plotly.offline import plot
+import plotly.express as px 
 from .models import Project, Task, Division, Ward, Village, Office
 from .forms import UserRegistrationForm, ProjectForm, TaskForm
 
@@ -53,17 +64,6 @@ def project_detail(request, project_id):
         'tasks': tasks
     })
 
-
-### arleady on top for post_detail
-# @login_required(login_url='login')
-# def task_detail(request, task_id):
-#     task = get_object_or_404(Task, id=task_id)
-
-#     return render(request, 'task_detail.html', {
-#         'task': task
-#     })
-
-# Views for listing and filtering based on hierarchy
 
 @login_required(login_url='login')
 def division_detail(request, division_id):
@@ -127,3 +127,93 @@ def create_task(request, project_id):
         form = TaskForm()
 
     return render(request, 'create_task.html', {'form': form, 'project': project})
+
+
+# Gant and Pie Charts
+@login_required(login_url='login')
+def project_dashboard(request):
+    projects = Project.objects.all()
+    tasks = Task.objects.select_related('project').all()
+    
+    # Prepare data for Gantt chart
+    gantt_data = []
+    for task in tasks:
+        gantt_data.append({
+            'Task': task.name,
+            'Start': task.project.start_date,
+            'Finish': task.due_date,
+            'Resource': task.project.name,
+            'Completion': task.get_status_display(),
+            'Assigned To': task.assigned_to.username
+        })
+    
+    # Create Gantt chart
+    fig = px.timeline(
+        gantt_data, 
+        x_start='Start', 
+        x_end='Finish', 
+        y='Task',
+        color='Resource', 
+        title='Project Timeline',
+        labels={'color': 'Project'}
+    )
+    fig.update_layout(
+        xaxis_title='Date',
+        yaxis_title='Task',
+        margin=dict(l=20, r=20, t=20, b=20),
+        hovermode='x unified'
+    )
+    gantt_chart = plot(fig, output_type='div')
+
+    # Create additional charts or stats as needed here
+    # Example: Project status pie chart
+    status_data = tasks.values('status').annotate(count=models.Count('status'))
+    labels = [status['status'] for status in status_data]
+    values = [status['count'] for status in status_data]
+
+    pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    pie_chart.update_layout(title_text='Tasks Status Distribution')
+    pie_chart_div = plot(pie_chart, output_type='div')
+
+    return render(request, 'project_dashboard.html', {
+        'gantt_chart': gantt_chart,
+        'pie_chart_div': pie_chart_div,
+        'projects': projects,
+        'tasks': tasks
+    })
+
+
+
+
+
+
+
+# Signals
+@receiver(post_save, sender=Task)
+def send_task_notification(sender, instance, created, **kwargs):
+    if created:
+        subject = f"New Task Assigned: {instance.name}"
+        message = f"A new task has been assigned to you: {instance.name}\nDescription: {instance.description}\nDue Date: {instance.due_date}"
+        recipient_list = [instance.assigned_to.email]
+        send_mail(subject, message, 'admin@yourdomain.com', recipient_list)
+
+
+@receiver(post_save, sender=Task)
+def log_task_activity(sender, instance, created, **kwargs):
+    action = 'Created' if created else 'Updated'
+    ActivityLog.objects.create(
+        action=action,
+        content_type=ContentType.objects.get_for_model(instance),
+        object_id=instance.id,
+        description=f'{action} task: {instance.name}'
+    )
+
+@receiver(pre_delete, sender=Task)
+def log_task_deletion(sender, instance, **kwargs):
+    ActivityLog.objects.create(
+        action='Deleted',
+        content_type=ContentType.objects.get_for_model(instance),
+        object_id=instance.id,
+        description=f'Deleted task: {instance.name}'
+    )
+

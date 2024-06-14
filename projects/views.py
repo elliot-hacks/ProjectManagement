@@ -53,13 +53,15 @@ def project_detail(request, project_id):
         'tasks': tasks
     })
 
-@login_required(login_url='login')
-def task_detail(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
 
-    return render(request, 'task_detail.html', {
-        'task': task
-    })
+### arleady on top for post_detail
+# @login_required(login_url='login')
+# def task_detail(request, task_id):
+#     task = get_object_or_404(Task, id=task_id)
+
+#     return render(request, 'task_detail.html', {
+#         'task': task
+#     })
 
 # Views for listing and filtering based on hierarchy
 

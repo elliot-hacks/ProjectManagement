@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <section>
+            <h2>Division Details</h2>
+            <p><strong>Name:</strong> {{ division.name }}</p>
+            <p><strong>Number of Wards:</strong> {{ wards.count }}</p>
+        </section>
+        <section>
+            <h2>Wards in {{ division.name }}</h2>
+            {% if wards %}
+                <ul>
+                    {% for ward in wards %}
+                        <li>{{ ward.name }} (Ward)</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No wards found in this division.</p>
+            {% endif %}
+        </section>
+{% endblock %}

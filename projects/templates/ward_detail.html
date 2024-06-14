@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+        <section>
+            <h1>{{ ward.name }} Ward</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'division_detail' division_id=ward.division.id %}">Back to Division</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+            <h2>Ward Details</h2>
+            <p><strong>Name:</strong> {{ ward.name }}</p>
+            <p><strong>District:</strong> {{ ward.district.name }}</p>
+            <p><strong>Number of Villages:</strong> {{ villages.count }}</p>
+        </section>
+        <section>
+            <h2>Villages in {{ ward.name }} Ward</h2>
+            {% if villages %}
+                <ul>
+                    {% for village in villages %}
+                        <li>{{ village.name }} (Village)</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No villages found in this ward.</p>
+            {% endif %}
+        </section>
+{% endblock %}

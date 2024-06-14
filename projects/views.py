@@ -184,8 +184,79 @@ def project_dashboard(request):
 
 
 
+# PDF generators
+@login_required(login_url='login')
+def project_report(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    tasks = Task.objects.filter(project=project)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{project.name}_report.pdf"'
 
+    # Create a PDF document
+    buffer = response
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
 
+    # Container for the PDF elements
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+    # Title
+    elements.append(Paragraph(f"Project Report: {project.name}", styles['Title']))
+    # Project Details
+    project_details = f"""
+    <b>Project Name:</b> {project.name}<br/>
+    <b>Project Code:</b> {project.id}<br/>
+    <b>Supervisor:</b> {project.supervisor.get_full_name()}<br/>
+    <b>Total Cost:</b> ${project.budget}<br/>
+    <b>Start Date:</b> {project.start_date.strftime('%Y-%m-%d')}<br/>
+    <b>End Date:</b> {project.end_date.strftime('%Y-%m-%d')}<br/>
+    <b>Source of Fund:</b> {project.source_of_fund}<br/>
+    """
+    elements.append(Paragraph(project_details, styles['Normal']))
+    elements.append(Spacer(1, 12))
+
+    # Task Progress
+    task_data = []
+    task_data.append(['Task Name', 'Assigned To', 'Due Date', 'Status'])
+
+    for task in tasks:
+        task_data.append([
+            task.name,
+            task.assigned_to.get_full_name(),
+            task.due_date.strftime('%Y-%m-%d'),
+            task.get_status_display()
+        ])
+
+    table = Table(task_data, colWidths=[200, 100, 100, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))
+
+    # Progress Evaluation
+    completed_tasks = tasks.filter(status=Task.STATUS_DONE).count()
+    total_tasks = tasks.count()
+    progress_percentage = (completed_tasks / total_tasks) * 100 if total_tasks > 0 else 0
+
+    progress_evaluation = f"""
+    <b>Progress Evaluation:</b> {progress_percentage:.2f}% Complete
+    """
+    elements.append(Paragraph(progress_evaluation, styles['Normal']))
+
+    # Build the PDF
+    doc.build(elements)
+
+    return response
 
 
 # Signals

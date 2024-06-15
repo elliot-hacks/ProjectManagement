@@ -50,6 +50,14 @@ def u_login(request):
 def about(request):
     return render(request, 'about.html')
 
+def service(request):
+    return render(request, 'service.html')
+
+
+# Modify it later to call upon projects and Tasks
+def project(request):
+    return render(request, 'project.html')
+
 
 def custom_logout(request):
     logout(request)

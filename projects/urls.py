@@ -13,7 +13,9 @@ urlpatterns = [
     path('ward/<int:ward_id>/', views.ward_detail, name='ward_detail'),
     path('village/<int:village_id>/', views.village_detail, name='village_detail'),
     path('task/<int:project_id>/', views.create_task, name='create_task'),
-    path('dashboard/', views.project_dashboard, name='project_dashboard'),
+    path('project_report', views.project_report, name='project_report'),
     path('login/', views.u_login, name='login'),
     path('about/', views.about, name='about'),
+    path('project/', views.project, name='project'),
+    path('service/', views.service, name='service'),
 ]

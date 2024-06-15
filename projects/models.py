@@ -66,7 +66,6 @@ class Project(models.Model):
         return self.name
 
 
-
 class Task(models.Model):
     STATUS_CHOICES = [
         ('To Do', 'To Do'),
@@ -96,6 +95,16 @@ class Task(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()  # Validate model fields
         super().save(*args, **kwargs)
+
+
+class Comment(models.Model):
+    project = models.ForeignKey(Project, related_name='projects_comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='projects_comments', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.project.name}"
 
 # For logging all activities
 class ActivityLog(models.Model):

@@ -49,7 +49,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'project_code', 'supervisor', 'total_cost', 'start_date', 'end_date', 'evaluation_percentage', 'location', 'office')
     search_fields = ('name', 'project_code', 'supervisor__username', 'location__name')
     list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'office')
-    readonly_fields = ('start_date', 'supervisor')  # start_date and supervisor are read-only after creation
+    # readonly_fields = ('start_date', 'supervisor')  # start_date and supervisor are read-only after creation
     inlines = [TaskInline]
     fieldsets = (
         ('General Information', {
@@ -65,10 +65,10 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('name', 'project', 'assigned_to', 'status', 'due_date')
+    list_display = ['project','name','description', 'assigned_to', 'due_date', 'status']
     search_fields = ('name', 'project__name', 'assigned_to__username')
     list_filter = ('status', 'due_date', 'project')
-    readonly_fields = ('project',)  # Task should remain linked to its project and not changeable after creation
+    # readonly_fields = ('project',)  # Task should remain linked to its project and not changeable after creation
     fieldsets = (
         (None, {
             'fields': ('project', 'name', 'description', 'assigned_to', 'due_date', 'status')
@@ -85,14 +85,16 @@ class OfficeAdmin(admin.ModelAdmin):
 
 
 # Custom dashbord for every user
-# from admin_tools.dashboard import modules
-# from admin_tools.dashboard.models import DashboardPreferences
-# from admin_tools.utils import get_admin_site
+"""
+from django.contrib import admin
+from admin_tools.dashboard.models import DashboardPreferences
+from admin_tools.utils import get_admin_site
 
-# from .dashboard import CustomIndexDashboard, MyAppDashboard
+from .dashboard import CustomIndexDashboard, MyAppDashboard
 
-# admin.site.unregister(DashboardPreferences)
-
+admin.site.unregister(DashboardPreferences)
+admin.site.register([CustomIndexDashboard, MyAppDashboard], get_admin_site())
+"""
 
 
 # To be implemented if there is confict of one group deleting user from other group of superior priveledges

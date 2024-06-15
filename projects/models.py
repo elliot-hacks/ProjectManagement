@@ -44,7 +44,7 @@ class Office(models.Model):
     location = models.ForeignKey(Division, related_name='offices', on_delete=models.CASCADE)  # Assuming offices are at Division level
 
     def __str__(self):
-        return f"{self.name} ({self.type})"
+        return f"{self.name} ({self.office_type})"
 
 
 class Project(models.Model):
@@ -77,7 +77,7 @@ class Task(models.Model):
     project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    assigned_to = models.ForeignKey(User, related_name='tasks', on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_to = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
     due_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='To Do')
 

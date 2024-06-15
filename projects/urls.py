@@ -9,6 +9,11 @@ urlpatterns = [
     path('dashboard/', views.project_dashboard, name='project_dashboard'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),
+    path('division/<int:division_id>/', views.division_detail, name='division_detail'),
+    path('ward/<int:ward_id>/', views.ward_detail, name='ward_detail'),
+    path('village/<int:village_id>/', views.village_detail, name='village_detail'),
+    path('task/<int:project_id>/', views.create_task, name='create_task'),
+    path('dashboard/', views.project_dashboard, name='project_dashboard'),
     path('login/', views.u_login, name='login'),
     path('about/', views.about, name='about'),
 ]

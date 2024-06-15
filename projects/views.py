@@ -13,8 +13,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib import colors
 import plotly.graph_objects as go
 from plotly.offline import plot
-import plotly.express as px 
-from .models import Project, Task, Division, Ward, Village, Office
+import plotly.express as px
+import pandas as pd
+from .models import Project, Task, Division, Ward, Village, Office, ActivityLog
 from .forms import UserRegistrationForm, ProjectForm, TaskForm
 
 
@@ -133,55 +134,53 @@ def create_task(request, project_id):
 @login_required(login_url='login')
 def project_dashboard(request):
     projects = Project.objects.all()
-    tasks = Task.objects.select_related('project').all()
+    tasks = Task.objects.select_related('project', 'assigned_to').all()
     
-    # Prepare data for Gantt chart
+    # Example code for preparing Gantt chart data (ensure data formatting is correct)
     gantt_data = []
     for task in tasks:
-        gantt_data.append({
-            'Task': task.name,
-            'Start': task.project.start_date,
-            'Finish': task.due_date,
-            'Resource': task.project.name,
-            'Completion': task.get_status_display(),
-            'Assigned To': task.assigned_to.username
-        })
+        if task.project and task.assigned_to:
+            gantt_data.append({
+                'Task': task.name,
+                'Start': task.project.start_date,
+                'Finish': task.due_date,
+                'Resource': task.project.name,
+                'Assigned To': task.assigned_to.username
+            })
     
-    # Create Gantt chart
-    fig = px.timeline(
-        gantt_data, 
-        x_start='Start', 
-        x_end='Finish', 
-        y='Task',
-        color='Resource', 
-        title='Project Timeline',
-        labels={'color': 'Project'}
-    )
-    fig.update_layout(
-        xaxis_title='Date',
-        yaxis_title='Task',
-        margin=dict(l=20, r=20, t=20, b=20),
-        hovermode='x unified'
-    )
-    gantt_chart = plot(fig, output_type='div')
+    # Example code for creating Gantt chart (ensure Plotly setup and usage is correct)
+    if gantt_data:
+        gantt_df = pd.DataFrame(gantt_data)
+        fig = go.Figure()
 
-    # Create additional charts or stats as needed here
-    # Example: Project status pie chart
-    status_data = tasks.values('status').annotate(count=models.Count('status'))
-    labels = [status['status'] for status in status_data]
-    values = [status['count'] for status in status_data]
+        for row in gantt_df.itertuples():
+            fig.add_trace(go.Scatter(
+                x=[row.Start, row.Finish],
+                y=[row.Task, row.Task],
+                mode='lines',
+                line=dict(width=20),
+                name=row.Resource
+            ))
 
-    pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    pie_chart.update_layout(title_text='Tasks Status Distribution')
-    pie_chart_div = plot(pie_chart, output_type='div')
+        fig.update_layout(
+            title='Project Timeline',
+            xaxis_title='Date',
+            yaxis_title='Task',
+            showlegend=True,
+            hovermode='x unified',
+            margin=dict(l=20, r=20, t=40, b=20),
+        )
+
+        gantt_chart = plot(fig, output_type='div')
+
+    else:
+        gantt_chart = None  # Handle case where no data is available
 
     return render(request, 'project_dashboard.html', {
         'gantt_chart': gantt_chart,
-        'pie_chart_div': pie_chart_div,
         'projects': projects,
         'tasks': tasks
     })
-
 
 
 # PDF generators
@@ -261,18 +260,14 @@ def project_report(request, project_id):
 
 
 
-
-
-
-
 # Signals
 @receiver(post_save, sender=Task)
 def send_task_notification(sender, instance, created, **kwargs):
     if created:
         subject = f"New Task Assigned: {instance.name}"
         message = f"A new task has been assigned to you: {instance.name}\nDescription: {instance.description}\nDue Date: {instance.due_date}"
-        recipient_list = [instance.assigned_to.email]
-        send_mail(subject, message, 'admin@yourdomain.com', recipient_list)
+        # recipient_list = [instance.assigned_to.email]
+        # send_mail(subject, message, 'admin@yourdomain.com', recipient_list)
 
 
 @receiver(post_save, sender=Task)

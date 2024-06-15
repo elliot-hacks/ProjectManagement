@@ -12,6 +12,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 import plotly.graph_objects as go
+from django.db.models import Sum
 from plotly.offline import plot
 import plotly.express as px
 import pandas as pd
@@ -149,38 +150,51 @@ def project_dashboard(request):
             })
     
     # Example code for creating Gantt chart (ensure Plotly setup and usage is correct)
+    # Create Gantt chart
     if gantt_data:
-        gantt_df = pd.DataFrame(gantt_data)
-        fig = go.Figure()
-
-        for row in gantt_df.itertuples():
-            fig.add_trace(go.Scatter(
-                x=[row.Start, row.Finish],
-                y=[row.Task, row.Task],
-                mode='lines',
-                line=dict(width=20),
-                name=row.Resource
-            ))
-
-        fig.update_layout(
-            title='Project Timeline',
-            xaxis_title='Date',
-            yaxis_title='Task',
-            showlegend=True,
-            hovermode='x unified',
-            margin=dict(l=20, r=20, t=40, b=20),
-        )
-
-        gantt_chart = plot(fig, output_type='div')
-
+        gantt_chart = create_gantt_chart(gantt_data)
     else:
         gantt_chart = None  # Handle case where no data is available
+    
+    # Prepare data for Tasks Status Distribution (Pie chart)
+    status_data = tasks.values('status').annotate(count=Sum('budget'))
+
+    labels = [status['status'] for status in status_data]
+    values = [status['count'] for status in status_data]
+
+    pie_chart = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    pie_chart.update_layout(title_text='Tasks Budget Distribution')
+    pie_chart_div = plot(pie_chart, output_type='div')
 
     return render(request, 'dashboard.html', {
         'gantt_chart': gantt_chart,
+        'pie_chart_div': pie_chart_div,
         'projects': projects,
         'tasks': tasks
     })
+
+def create_gantt_chart(gantt_data):
+    fig = go.Figure()
+
+    for row in gantt_data:
+        fig.add_trace(go.Scatter(
+            x=[row['Start'], row['Finish']],
+            y=[row['Task'], row['Task']],
+            mode='lines',
+            line=dict(width=20),
+            name=row['Resource']
+        ))
+
+    fig.update_layout(
+        title='Project Timeline',
+        xaxis_title='Date',
+        yaxis_title='Task',
+        showlegend=True,
+        hovermode='x unified',
+        margin=dict(l=20, r=20, t=40, b=20),
+    )
+
+    return plot(fig, output_type='div')
 
 
 # PDF generators

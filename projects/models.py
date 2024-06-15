@@ -80,10 +80,22 @@ class Task(models.Model):
     assigned_to = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
     due_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='To Do')
+    budget = models.DecimalField(max_digits=12, decimal_places=2)  # Assuming budget is a decimal field
 
     def __str__(self):
         return f"{self.name} ({self.project.name})"
 
+    def clean(self):
+        # Ensure task budget is within project's total cost range
+        if self.budget < 0:
+            raise ValidationError('Budget must be a positive number.')
+        
+        if self.budget > self.project.total_cost:
+            raise ValidationError('Task budget cannot exceed project total cost.')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Validate model fields
+        super().save(*args, **kwargs)
 
 # For logging all activities
 class ActivityLog(models.Model):

@@ -176,7 +176,7 @@ def project_dashboard(request):
     else:
         gantt_chart = None  # Handle case where no data is available
 
-    return render(request, 'project_dashboard.html', {
+    return render(request, 'dashboard.html', {
         'gantt_chart': gantt_chart,
         'projects': projects,
         'tasks': tasks

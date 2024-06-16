@@ -20,15 +20,19 @@ class WardInline(admin.TabularInline):
 @admin.register(models.Division)
 class DivisionAdmin(admin.ModelAdmin):
     list_display = ('name', 'code')
-    search_fields = ('name', 'code')
+    search_fields = ('name__icontains', 'code__contains')
+    list_per_page = 10
     inlines = [WardInline]
 
 
 @admin.register(models.Ward)
 class WardAdmin(admin.ModelAdmin):
-    list_display = ('name', 'division')
-    search_fields = ('name',)
-    list_filter = ('division',)
+    list_display = ['name', 'division']
+    list_per_page = 10
+    list_select_related = ['division']
+    autocomplete_fields = ['division']
+    search_fields = ['division__icontains',]
+    list_filter = ['division',]
     inlines = [VillageInline]
 
 
@@ -36,9 +40,10 @@ class WardAdmin(admin.ModelAdmin):
 class VillageAdmin(admin.ModelAdmin):
     list_display = ['name', 'ward']
     list_per_page = 10
-    list_select_related = []
-    search_fields = ['name',]
-    list_filter = ['ward', 'ward__division']
+    list_select_related = ['ward']
+    autocomplete_fields = ['ward']
+    search_fields = ['ward__icontains',]
+    list_filter = ['ward']
 
 
 class TaskInline(admin.TabularInline):
@@ -48,15 +53,14 @@ class TaskInline(admin.TabularInline):
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description')
-    search_fields = ('name', 'project_code', 'supervisor__username', 'location__name')
+    list_display = ['name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
+    search_fields = ('name__icontains', 'project_code', 'supervisor__username', 'location__name')
     list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'office')
-    # readonly_fields = ('start_date', 'supervisor')  # start_date and supervisor are read-only after creation
+    list_select_related = ['supervisor', 'office', 'location']
+    autocomplete_fields = list_select_related = ['supervisor', 'office', 'location']
+    list_per_page = 10
     inlines = [TaskInline]
     fieldsets = (
-        ('General Information', {
-            'fields': ('name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description')
-        }),
         ('Location and Office', {
             'fields': ('location', 'office')
         }),
@@ -70,7 +74,9 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ['project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status']
     search_fields = ('name', 'project__name', 'assigned_to__username')
     list_filter = ('status', 'due_date', 'project')
-    # readonly_fields = ('project',)  # Task should remain linked to its project and not changeable after creation
+    list_select_related = ['project', 'assigned_to']
+    autocomplete_fields = ['project', 'assigned_to']
+    list_per_page = 10
     fieldsets = (
         (None, {
             'fields': ('project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status')
@@ -82,7 +88,18 @@ class OfficeAdmin(admin.ModelAdmin):
     list_display = ('name', 'office_type', 'location')
     search_fields = ('name', 'office_type')
     list_filter = ('office_type',)
+    list_select_related = ['location']
+    autocomplete_fields = ['location']
+    list_per_page = 10
 
+
+@admin.register(models.Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['project', 'user', 'content', 'created_at']
+    list_select_related = ['project', 'user']
+    search_fields = ['project', 'user', 'created_at']
+    autocomplete_fields = ['project', 'user']
+    list_per_page = 10
 
 
 # Custom dashbord for every user

@@ -60,7 +60,7 @@ class Project(models.Model):
     project_pictures = models.ImageField(upload_to='media/projects/pictures/', null=True, blank=True)
     evaluation_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0) 
     location = models.ForeignKey(Village, related_name='projects', on_delete=models.SET_NULL, null=True, blank=True)
-    comments = models.TextField(null=True, blank=True) 
+    # comments = models.TextField(null=True, blank=True) 
 
     def __str__(self):
         return self.name

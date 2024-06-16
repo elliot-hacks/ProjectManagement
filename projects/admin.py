@@ -34,9 +34,11 @@ class WardAdmin(admin.ModelAdmin):
 
 @admin.register(models.Village)
 class VillageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ward')
-    search_fields = ('name',)
-    list_filter = ('ward', 'ward__division')
+    list_display = ['name', 'ward']
+    list_per_page = 10
+    list_select_related = []
+    search_fields = ['name',]
+    list_filter = ['ward', 'ward__division']
 
 
 class TaskInline(admin.TabularInline):
@@ -46,14 +48,14 @@ class TaskInline(admin.TabularInline):
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'project_code', 'supervisor', 'total_cost', 'start_date', 'end_date', 'evaluation_percentage', 'location', 'office')
+    list_display = ('name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description')
     search_fields = ('name', 'project_code', 'supervisor__username', 'location__name')
     list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'office')
     # readonly_fields = ('start_date', 'supervisor')  # start_date and supervisor are read-only after creation
     inlines = [TaskInline]
     fieldsets = (
         ('General Information', {
-            'fields': ('name', 'project_code', 'description', 'total_cost', 'start_date', 'end_date', 'source_of_fund', 'evaluation_percentage', 'supervisor')
+            'fields': ('name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description')
         }),
         ('Location and Office', {
             'fields': ('location', 'office')
@@ -65,16 +67,15 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ['project','name','description', 'assigned_to', 'due_date', 'status']
+    list_display = ['project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status']
     search_fields = ('name', 'project__name', 'assigned_to__username')
     list_filter = ('status', 'due_date', 'project')
     # readonly_fields = ('project',)  # Task should remain linked to its project and not changeable after creation
     fieldsets = (
         (None, {
-            'fields': ('project', 'name', 'description', 'assigned_to', 'due_date', 'status')
+            'fields': ('project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status')
         }),
     )
-
 
 @admin.register(models.Office)
 class OfficeAdmin(admin.ModelAdmin):

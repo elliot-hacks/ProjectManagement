@@ -16,6 +16,7 @@ urlpatterns = [
     path('project_report', views.project_report, name='project_report'),
     path('login/', views.u_login, name='login'),
     path('about/', views.about, name='about'),
+    path('comment/', views.project_comment, name='project_comment'),
     path('project/', views.project, name='project'),
     path('service/', views.service, name='service'),
 ]

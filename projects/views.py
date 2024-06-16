@@ -16,8 +16,8 @@ from django.db.models import Sum
 from plotly.offline import plot
 import plotly.express as px
 import pandas as pd
-from .models import Project, Task, Division, Ward, Village, Office, ActivityLog
-from .forms import UserRegistrationForm, ProjectForm, TaskForm
+from .models import Project, Task, Division, Ward, Village, Office, ActivityLog, Comment
+from .forms import UserRegistrationForm, ProjectForm, TaskForm, CommentForm
 
 
 @login_required(login_url='login')
@@ -104,6 +104,31 @@ def village_detail(request, village_id):
         'village': village,
         'projects': projects
     })
+
+
+
+@login_required(login_url='login')
+def project_comment(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    comments = project.comments.select_related('user').order_by('-created_at')
+    comment_form = CommentForm()
+
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.project = project
+            comment.user = request.user
+            comment.save()
+            messages.success(request, 'Comment added successfully.')
+            return redirect('comment', project_id=project.id)
+
+    return render(request, 'comment.html', {
+        'project': project,
+        'comments': comments,
+        'comment_form': comment_form,
+    })
+
 
 # Project and Task creation views
 @login_required(login_url='login')

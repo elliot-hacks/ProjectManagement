@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import Project, Task
+from .models import Project, Task, Comment
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -93,3 +93,11 @@ class TaskForm(forms.ModelForm):
         if due_date < timezone.now().date():
             raise forms.ValidationError("Due date cannot be in the past.")
         return due_date
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter your comment here...'}),
+        }

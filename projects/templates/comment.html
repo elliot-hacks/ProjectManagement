@@ -1,13 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 <section>
-    <h3>Comments</h3>
-    <form method="post" action="{% url 'add_comment' task.id %}">
-        {% csrf_token %}
-        <textarea name="comment" required></textarea>
-        <button type="submit">Add Comment</button>
-    </form>
-    <ul>
-        {% for comment in task.comments.all %}
-            <li><strong>{{ comment.user.username }}:</strong> {{ comment.text }} <em>({{ comment.timestamp }})</em></li>
-        {% endfor %}
-    </ul>
+    <h2>Project Details</h2>
+    <p>{{ project.description }}</p>
+    <p><strong>Total Cost:</strong> {{ project.total_cost }}</p>
+    <p><strong>Start Date:</strong> {{ project.start_date }}</p>
+    <p><strong>End Date:</strong> {{ project.end_date }}</p>
+    <p><strong>Source of Fund:</strong> {{ project.source_of_fund }}</p>
 </section>
+<section>
+    <h2>Comments</h2>
+    <div>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit">Add Comment</button>
+        </form>
+    </div>
+
+    <div>
+        {% for comment in comments %}
+            <div class="comment">
+                <p><strong>{{ comment.user.username }}</strong> ({{ comment.created_at }})</p>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p>No comments yet. Be the first to comment!</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

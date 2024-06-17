@@ -33,19 +33,16 @@
                         </div>
                         <div class="col-md-8">
                             <div class="project-content mb-4">
-                                <p class="fs-5 text-secondary mb-2">{{ project.name }}</p>
-                                <a href="#" class="h4">{{ project.project_code }}</a>
-                                <p class="mb-0 mt-3">{{ project.description }}</p>
+                                <p class="fs-5 text-secondary mb-2" href="{% url 'project_detail' project.id %}">{{ project.name }}</p>
+                                <a href="{% url 'project_detail' project.id %}" class="h4">{{ project.project_code }}</a>
+                                <p class="mb-0 mt-3" href="{% url 'project_detail' project.id %}"   >{{ project.description }}</p>
                             </div>
-                            <a class="btn btn-primary py-2 px-4" href="#">Read More</a>
+                            <a class="btn btn-primary py-2 px-4" href="{% url 'project_detail' project.id %}">Read More</a>
                         </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
-            <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.2s">
-                <a class="btn btn-secondary py-3 px-5" href="#">More Projects</a>
-            </div>
         </div>
     </div>
 </div>

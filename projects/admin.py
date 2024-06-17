@@ -53,16 +53,16 @@ class TaskInline(admin.TabularInline):
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'project_code', 'supervisor', 'office', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
+    list_display = ['name', 'project_code', 'supervisor', 'contructor', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
     search_fields = ('name__icontains', 'project_code', 'supervisor__username', 'location__name')
-    list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'office')
-    list_select_related = ['supervisor', 'office', 'location']
-    autocomplete_fields = list_select_related = ['supervisor', 'office', 'location']
+    list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'contructor')
+    list_select_related = ['supervisor', 'contructor', 'location']
+    autocomplete_fields = list_select_related = ['supervisor', 'contructor', 'location']
     list_per_page = 10
     inlines = [TaskInline]
     fieldsets = (
-        ('Location and Office', {
-            'fields': ('location', 'office')
+        ('Location and contructor', {
+            'fields': ('location', 'contructor')
         }),
         ('Attachments', {
             'fields': ('project_pictures',)
@@ -83,8 +83,8 @@ class TaskAdmin(admin.ModelAdmin):
         }),
     )
 
-@admin.register(models.Office)
-class OfficeAdmin(admin.ModelAdmin):
+@admin.register(models.Contructor)
+class ContructorAdmin(admin.ModelAdmin):
     list_display = ('name', 'office_type', 'location')
     search_fields = ('name', 'office_type')
     list_filter = ('office_type',)

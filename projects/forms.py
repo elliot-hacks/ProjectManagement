@@ -51,7 +51,7 @@ class ProjectForm(forms.ModelForm):
             'project_pictures',
             'evaluation_percentage',
             'location',
-            'office'
+            'contructor'
         ]
         widgets = {
             'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),

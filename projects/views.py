@@ -16,14 +16,14 @@ from django.db.models import Sum
 from plotly.offline import plot
 import plotly.express as px
 import pandas as pd
-from .models import Project, Task, Division, Ward, Village, Office, ActivityLog, Comment
+from .models import Project, Task, Division, Ward, Village, Contructor, ActivityLog, Comment
 from .forms import UserRegistrationForm, ProjectForm, TaskForm, CommentForm
 
 
 @login_required(login_url='login')
 def index(request):
     divisions = Division.objects.prefetch_related('wards__villages').all()
-    projects = Project.objects.select_related('supervisor', 'location__ward__division', 'office').all()
+    projects = Project.objects.select_related('supervisor', 'location__ward__division', 'Contructor').all()
     tasks = Task.objects.select_related('project__location__ward__division', 'assigned_to').all()
     
     return render(request, 'index.html', {
@@ -56,7 +56,10 @@ def service(request):
 
 # Modify it later to call upon projects and Tasks
 def project(request):
-    return render(request, 'project.html')
+    projects = Project.object.select_related('supervisor', 'location').all()
+    return render(request, 'project.html',{
+        'projects': projects,
+    })
 
 
 def custom_logout(request):

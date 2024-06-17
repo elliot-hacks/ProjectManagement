@@ -32,7 +32,7 @@ class Village(models.Model):
         return f"{self.name} ({self.ward.name})"
 
 
-class Office(models.Model):
+class Contructor(models.Model):
     name = models.CharField(max_length=100, unique=True)
     office_type = models.CharField(max_length=50, choices=[  # Example choices
         ('Village Office', 'Village Office'),
@@ -49,7 +49,7 @@ class Office(models.Model):
 
 class Project(models.Model):
     supervisor = models.ForeignKey(User, related_name='supervised_projects', on_delete=models.SET_NULL, null=True)
-    office = models.ForeignKey(Office, related_name='projects', on_delete=models.SET_NULL, null=True, blank=True)
+    contructor = models.ForeignKey(Contructor, related_name='projects', on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=255)
     project_code = models.CharField(max_length=50, unique=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2)

@@ -20,7 +20,6 @@ from .models import Project, Task, Division, Ward, Village, Contructor, Activity
 from .forms import UserRegistrationForm, ProjectForm, TaskForm, CommentForm
 
 
-@login_required(login_url='login')
 def index(request):
     divisions = Division.objects.prefetch_related('wards__villages').all()
     projects = Project.objects.select_related('supervisor', 'location__ward__division', 'Contructor').all()
@@ -53,10 +52,14 @@ def about(request):
 def service(request):
     return render(request, 'service.html')
 
+def contact(request):
+    return render(request, 'contact.html')
+
 
 # Modify it later to call upon projects and Tasks
+@login_required(login_url='login')
 def project(request):
-    projects = Project.object.select_related('supervisor', 'location').all()
+    projects = Project.objects.select_related('supervisor', 'location').all()
     return render(request, 'project.html',{
         'projects': projects,
     })

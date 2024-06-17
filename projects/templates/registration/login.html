@@ -14,10 +14,16 @@
                     <div class="container-fluid">
                         <div class="form-box" style="text-align:center;">
                             <form method="post" action="" class="container-fluid" style ="position: relative;">
-                                {% csrf_token %}
-                                {{ form.as_p }}
-                                <input type="submit"/>
-                                <a href="{% url 'register' %}" class="nav-item nav-link active">Not Registered, Register</a>
+                                <div  class="container">
+                                    <div  class="row justify-content-center">
+                                      <div  class="col-4">
+                                            {% csrf_token %}
+                                            {{ form.as_p }}
+                                            <input type="submit"/>
+                                            <a href="{% url 'register' %}" class="nav-item nav-link active">Not Registered, Register</a>
+                                      </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

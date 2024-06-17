@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.dispatch import receiver
 from django.contrib import messages
@@ -65,9 +66,9 @@ def project(request):
     })
 
 
-def custom_logout(request):
+def logout_view(request):
     logout(request)
-    return redirect(reverse('login'))
+    return HttpResponseRedirect('/')
 
 
 @login_required(login_url='login')

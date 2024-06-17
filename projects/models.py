@@ -42,7 +42,7 @@ class Contructor(models.Model):
         ('District Executive Director Office', 'District Executive Director Office'),
     ])
     location = models.ForeignKey(Division, related_name='offices', on_delete=models.CASCADE)
-    email = models.EmailField(max_length=20, unique=True, null=True, blank=True)
+    email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
     contructor_attachments = models.FileField(upload_to='media/projects/attachments', null=True, blank=True)
 
 

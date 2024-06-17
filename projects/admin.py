@@ -55,7 +55,7 @@ class TaskInline(admin.TabularInline):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name', 'project_code', 'supervisor', 'contructor', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
     search_fields = ('name__icontains', 'project_code', 'supervisor__username', 'location__name')
-    list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'contructor')
+    # list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'contructor')
     list_select_related = ['supervisor', 'contructor', 'location']
     autocomplete_fields = list_select_related = ['supervisor', 'contructor', 'location']
     list_per_page = 10
@@ -63,6 +63,9 @@ class ProjectAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Location and contructor', {
             'fields': ('location', 'contructor')
+        }),
+        ("General Information", {
+            'fields': ('name', 'project_code', 'supervisor', 'source_of_fund', 'total_cost', 'start_date', 'end_date', 'evaluation_percentage', 'description')
         }),
         ('Attachments', {
             'fields': ('project_pictures',)

@@ -22,6 +22,17 @@
             }
         </style>
         <div class="container mt-4">
+            <h1>Project Management Dashboard</h1>
+                <section class="chart-container">
+                    <h2 class="chart-title">Project Timeline</h2>
+                    <div>{{ gantt_chart | safe }}</div>
+                </section>
+                <section class="chart-container">
+                    <h2 class="chart-title">Tasks Status Distribution</h2>
+                    <div>{{ pie_chart_div | safe }}</div>
+                </section>
+        </div>
+        <div class="container mt-4">
             <h1>Project Detail: {{ project.name }}</h1>
                 
             <p>{{ project.description }}</p>
@@ -29,7 +40,7 @@
             <p><strong>Start Date:</strong> {{ project.start_date }}</p>
             <p><strong>End Date:</strong> {{ project.end_date }}</p>
             <p><strong>Supervisor:</strong> {{ project.supervisor.get_full_name }}</p>
-            <a href="{% url 'project_report' project.id %}" class="btn btn-primary">Download Report</a> 
+            
         </div>
             <div class="container mt-4">
                 <h2>Project Tasks</h2>

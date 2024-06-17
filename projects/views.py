@@ -13,7 +13,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 import plotly.graph_objects as go
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from plotly.offline import plot
 import plotly.express as px
 import pandas as pd
@@ -57,20 +57,29 @@ def contact(request):
     return render(request, 'contact.html')
 
 
+# Modify it later to call upon projects and Tasks
+@login_required(login_url='login')
+def project(request):
+    projects = Project.objects.select_related('supervisor', 'location').all()
+    return render(request, 'project.html',{
+        'projects': projects,
+    })
+
+
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
 
 
-@login_required(login_url='login')
-def project_detail(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    tasks = project.tasks.select_related('assigned_to').all()
+# @login_required(login_url='login')
+# def project_detail(request, project_id):
+#     project = get_object_or_404(Project, id=project_id)
+#     tasks = project.tasks.select_related('assigned_to').all()
 
-    return render(request, 'project_detail.html', {
-        'project': project,
-        'tasks': tasks
-    })
+#     return render(request, 'project_detail.html', {
+#         'project': project,
+#         'tasks': tasks
+#     })
 
 
 @login_required(login_url='login')
@@ -164,11 +173,14 @@ def create_task(request, project_id):
 
 # Gant and Pie Charts
 @login_required(login_url='login')
-def project_dashboard(request):
-    projects = Project.objects.select_related('supervisor', 'location').all()
-    tasks = Task.objects.select_related('project', 'assigned_to').all()
+def project_detail(request, project_id):
+    # Get the specific project
+    project = get_object_or_404(Project, id=project_id)
     
-    # Example code for preparing Gantt chart data (ensure data formatting is correct)
+    # Get tasks related to the specific project
+    tasks = Task.objects.select_related('assigned_to').filter(project_id=project_id)
+    
+    # Prepare Gantt chart data
     gantt_data = []
     for task in tasks:
         if task.project and task.assigned_to:
@@ -180,14 +192,14 @@ def project_dashboard(request):
                 'Assigned To': task.assigned_to.username
             })
     
-    # Example code for creating Gantt chart (ensure Plotly setup and usage is correct)
     # Create Gantt chart
+    gantt_chart = None
     if gantt_data:
         gantt_chart = create_gantt_chart(gantt_data)
-    else:
-        gantt_chart = None  # Handle case where no data is available
-    
+
     # Prepare data for Tasks Status Distribution (Pie chart)
+    status_data = tasks.values('status').annotate(count=Count('id'))
+
     status_data = tasks.values('status').annotate(count=Sum('budget'))
 
     labels = [status['status'] for status in status_data]
@@ -197,10 +209,10 @@ def project_dashboard(request):
     pie_chart.update_layout(title_text='Tasks Budget Distribution')
     pie_chart_div = plot(pie_chart, output_type='div')
 
-    return render(request, 'project.html', {
+    return render(request, 'project_detail.html', {
         'gantt_chart': gantt_chart,
         'pie_chart_div': pie_chart_div,
-        'projects': projects,
+        'project': project,
         'tasks': tasks
     })
 
@@ -226,6 +238,7 @@ def create_gantt_chart(gantt_data):
     )
 
     return plot(fig, output_type='div')
+
 
 
 # PDF generators

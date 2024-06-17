@@ -21,17 +21,6 @@
             <p class="text-uppercase text-secondary fs-5 mb-0">Our Projects</p>
             <h2 class="display-4 text-capitalize mb-3">Recent Completed Projects</h2>
         </div>
-        <div class="container mt-4">
-            <h1>Project Management Dashboard</h1>
-                <section class="chart-container">
-                    <h2 class="chart-title">Project Timeline</h2>
-                    <div>{{ gantt_chart | safe }}</div>
-                </section>
-                <section class="chart-container">
-                    <h2 class="chart-title">Tasks Status Distribution</h2>
-                    <div>{{ pie_chart_div | safe }}</div>
-                </section>
-        </div>
         <div class="row g-5">
             {% for project in projects %}
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.2s">

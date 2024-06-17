@@ -57,15 +57,6 @@ def contact(request):
     return render(request, 'contact.html')
 
 
-# Modify it later to call upon projects and Tasks
-@login_required(login_url='login')
-def project(request):
-    projects = Project.objects.select_related('supervisor', 'location').all()
-    return render(request, 'project.html',{
-        'projects': projects,
-    })
-
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
@@ -174,7 +165,7 @@ def create_task(request, project_id):
 # Gant and Pie Charts
 @login_required(login_url='login')
 def project_dashboard(request):
-    projects = Project.objects.all()
+    projects = Project.objects.select_related('supervisor', 'location').all()
     tasks = Task.objects.select_related('project', 'assigned_to').all()
     
     # Example code for preparing Gantt chart data (ensure data formatting is correct)
@@ -206,7 +197,7 @@ def project_dashboard(request):
     pie_chart.update_layout(title_text='Tasks Budget Distribution')
     pie_chart_div = plot(pie_chart, output_type='div')
 
-    return render(request, 'dashboard.html', {
+    return render(request, 'project.html', {
         'gantt_chart': gantt_chart,
         'pie_chart_div': pie_chart_div,
         'projects': projects,

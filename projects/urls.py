@@ -7,7 +7,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('accounts/register/', views.u_register, name='register'),
-    path('dashboard/', views.project_dashboard, name='project_dashboard'),
+    # path('dashboard/', views.project_dashboard, name='project_dashboard'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),
     path('report/<int:report_id>/', views.project_report, name='project_report'),
@@ -19,7 +19,7 @@ urlpatterns = [
     path('login/', views.u_login, name='login'),
     path('about/', views.about, name='about'),
     path('comment/', views.project_comment, name='project_comment'),
-    path('project/', views.project, name='project'),
+    path('project/', views.project_dashboard, name='project'),
     path('service/', views.service, name='service'),
     path('contact/', views.contact, name='contact'),
     path('logout/', views.logout, name='logout'),

@@ -5,56 +5,57 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Division(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=100, null=True, blank=True)
+    division_name = models.CharField(max_length=100, unique=True)
+    # code = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.division_name
 
 class Ward(models.Model):
     division = models.ForeignKey(Division, related_name='wards', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    ward_name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ('division', 'name')
+        unique_together = ('division', 'ward_name')
 
     def __str__(self):
-        return f"{self.name} ({self.division.name})"
+        return f"{self.ward_name} ({self.division.division_name})"
 
 class Village(models.Model):
     ward = models.ForeignKey(Ward, related_name='villages', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    village_name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ('ward', 'name')
+        unique_together = ('ward', 'village_name')
 
     def __str__(self):
-        return f"{self.name} ({self.ward.name})"
+        return f"{self.village_name} ({self.ward.ward_name})"
 
 
-class Contructor(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    office_type = models.CharField(max_length=50, choices=[  # Example choices
-        ('Village Office', 'Village Office'),
-        ('Ward Executive Office', 'Ward Executive Office'),
-        ('Division Office', 'Division Office'),
-        ('Department of Planning and Coordination Office', 'Department of Planning and Coordination Office'),
-        ('District Executive Director Office', 'District Executive Director Office'),
-    ])
-    location = models.ForeignKey(Division, related_name='offices', on_delete=models.CASCADE)
-    email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
-    contructor_attachments = models.FileField(upload_to='media/projects/attachments', null=True, blank=True)
+# class ImplementationModel(models.Model):
+#     name = models.CharField(max_length=100, unique=True)
+#     office_type = models.CharField(max_length=50, choices=[  # Example choices
+#         ('Village Office', 'Village Office'),
+#         ('Ward Executive Office', 'Ward Executive Office'),
+#         ('Division Office', 'Division Office'),
+#         ('Department of Planning and Coordination Office', 'Department of Planning and Coordination Office'),
+#         ('District Executive Director Office', 'District Executive Director Office'),
+#     ])
+    # location = models.ForeignKey(Division, related_name='offices', on_delete=models.CASCADE)
+    # email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
+    # attachments = models.FileField(upload_to='media/projects/attachments', null=True, blank=True)
 
 
-    def __str__(self):
-        return f"{self.name} ({self.office_type})"
+    # def __str__(self):
+    #     return f"{self.name} ({self.office_type})"
 
 
 class Project(models.Model):
     supervisor = models.ForeignKey(User, related_name='supervised_projects', on_delete=models.SET_NULL, null=True)
-    contructor = models.ForeignKey(Contructor, related_name='projects', on_delete=models.SET_NULL, null=True, blank=True)
-    name = models.CharField(max_length=255)
+    # implementation_model = models.ForeignKey(ImplementationModel, related_name='projects', on_delete=models.SET_NULL, null=True, blank=True)
+    project_name = models.CharField(max_length=255)
     project_code = models.CharField(max_length=50, unique=True)
+    implementation_model = models.CharField(max_length=50, blank=True, null=True)
     total_cost = models.DecimalField(max_digits=12, decimal_places=2)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
@@ -66,7 +67,14 @@ class Project(models.Model):
     # comments = models.TextField(null=True, blank=True) 
 
     def __str__(self):
-        return self.name
+        return self.project_name
+
+
+class TaskPlan(models.Model):
+    task_state = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.task_state
 
 
 class Task(models.Model):
@@ -77,15 +85,16 @@ class Task(models.Model):
     ]
 
     project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    task_name = models.CharField(max_length=255)
     description = models.TextField()
+    task_state = models.ForeignKey(TaskPlan, on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
     due_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='To Do')
     budget = models.DecimalField(max_digits=12, decimal_places=2)  # Assuming budget is a decimal field
 
     def __str__(self):
-        return f"{self.name} ({self.project.name})"
+        return f"{self.task_name} ({self.project.project_name})"
 
     def clean(self):
         # Ensure task budget is within project's total cost range
@@ -107,7 +116,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.user.username} on {self.project.name}"
+        return f"Comment by {self.user.username} on {self.project.project_name}"
 
 # For logging all activities
 class ActivityLog(models.Model):

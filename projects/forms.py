@@ -41,7 +41,7 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
-            'name',
+            'project_name',
             'project_code',
             'total_cost',
             'start_date',
@@ -51,7 +51,7 @@ class ProjectForm(forms.ModelForm):
             'project_pictures',
             'evaluation_percentage',
             'location',
-            'contructor',
+            'implementation_model',
         ]
         widgets = {
             'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -77,7 +77,7 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = [
-            'name',
+            'task_name',
             'description',
             'assigned_to',
             'due_date',

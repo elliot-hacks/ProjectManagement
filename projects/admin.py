@@ -19,15 +19,15 @@ class WardInline(admin.TabularInline):
 
 @admin.register(models.Division)
 class DivisionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code')
-    search_fields = ('name__icontains', 'code__contains')
+    list_display = ['division_name']
+    search_fields = ['division_name']
     list_per_page = 10
     inlines = [WardInline]
 
 
 @admin.register(models.Ward)
 class WardAdmin(admin.ModelAdmin):
-    list_display = ['name', 'division']
+    list_display = ['ward_name', 'division']
     list_per_page = 10
     list_select_related = ['division']
     autocomplete_fields = ['division']
@@ -38,7 +38,7 @@ class WardAdmin(admin.ModelAdmin):
 
 @admin.register(models.Village)
 class VillageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'ward']
+    list_display = ['village_name', 'ward']
     list_per_page = 10
     list_select_related = ['ward']
     autocomplete_fields = ['ward']
@@ -53,47 +53,53 @@ class TaskInline(admin.TabularInline):
 
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'project_code', 'supervisor', 'contructor', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
-    search_fields = ('name__icontains', 'project_code', 'supervisor__username', 'location__name')
-    # list_filter = ('start_date', 'end_date', 'supervisor', 'location', 'contructor')
-    list_select_related = ['supervisor', 'contructor', 'location']
-    autocomplete_fields = list_select_related = ['supervisor', 'contructor', 'location']
+    list_display = ['project_name', 'project_code', 'supervisor', 'implementation_model', 'source_of_fund',  'total_cost', 'start_date', 'end_date', 'project_pictures', 'evaluation_percentage', 'location', 'description']
+    search_fields = ('project_name__icontains', 'project_code', 'supervisor__username', 'location__village_name')
+    list_select_related = ['supervisor', 'location']
+    autocomplete_fields = list_select_related = ['supervisor', 'location']
     list_per_page = 10
     inlines = [TaskInline]
     fieldsets = (
-        ('Location and contructor', {
-            'fields': ('location', 'contructor')
+        ('Location and ImplementationModel', {
+            'fields': ('location', 'implementation_model')
         }),
         ("General Information", {
-            'fields': ('name', 'project_code', 'supervisor', 'source_of_fund', 'total_cost', 'start_date', 'end_date', 'evaluation_percentage', 'description')
+            'fields': ('project_name', 'project_code', 'supervisor', 'source_of_fund', 'total_cost', 'start_date', 'end_date', 'evaluation_percentage', 'description')
         }),
         ('Attachments', {
             'fields': ('project_pictures',)
         }),
     )
 
+
+
+@admin.register(models.TaskPlan)
+class TaskPlanAdmin(admin.ModelAdmin):
+    list_display = ['task_state']
+
+
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ['project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status']
-    search_fields = ('name', 'project__name', 'assigned_to__username')
+    list_display = ['project','task_name', 'task_state', 'budget', 'description', 'assigned_to', 'due_date', 'status']
+    search_fields = ('task_name', 'project__project_name', 'assigned_to__username')
     list_filter = ('status', 'due_date', 'project')
     list_select_related = ['project', 'assigned_to']
     autocomplete_fields = ['project', 'assigned_to']
     list_per_page = 10
     fieldsets = (
         (None, {
-            'fields': ('project','name', 'budget', 'description', 'assigned_to', 'due_date', 'status')
+            'fields': ('project','task_name', 'task_state', 'budget', 'description', 'assigned_to', 'due_date', 'status')
         }),
     )
 
-@admin.register(models.Contructor)
-class ContructorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'office_type', 'location', 'email', 'contructor_attachments']
-    search_fields = ['name', 'office_type']
-    list_filter = ['location']
-    list_select_related = ['location']
-    autocomplete_fields = ['location']
-    list_per_page = 10
+# @admin.register(models.ImplementationModel)
+# class ImplementationModelAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'implementation_type',]
+#     search_fields = ['name', 'implementation_type']
+#     list_filter = ['location']
+#     list_select_related = ['location']
+#     autocomplete_fields = ['location']
+#     list_per_page = 10
 
 
 @admin.register(models.Comment)

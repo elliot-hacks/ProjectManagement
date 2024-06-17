@@ -17,13 +17,13 @@ from django.db.models import Sum, Count
 from plotly.offline import plot
 import plotly.express as px
 import pandas as pd
-from .models import Project, Task, Division, Ward, Village, Contructor, ActivityLog, Comment
+from .models import Project, Task, Division, Ward, Village, ActivityLog, Comment
 from .forms import UserRegistrationForm, ProjectForm, TaskForm, CommentForm
 
 
 def index(request):
     divisions = Division.objects.prefetch_related('wards__villages').all()
-    projects = Project.objects.select_related('supervisor', 'location__ward__division', 'Contructor').all()
+    projects = Project.objects.select_related('supervisor', 'location__ward__division').all()
     tasks = Task.objects.select_related('project__location__ward__division', 'assigned_to').all()
     
     return render(request, 'index.html', {
@@ -185,10 +185,10 @@ def project_detail(request, project_id):
     for task in tasks:
         if task.project and task.assigned_to:
             gantt_data.append({
-                'Task': task.name,
+                'Task': task.task_name,
                 'Start': task.project.start_date,
                 'Finish': task.due_date,
-                'Resource': task.project.name,
+                'Resource': task.project.project_name,
                 'Assigned To': task.assigned_to.username
             })
     
@@ -247,7 +247,7 @@ def project_report(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     tasks = Task.objects.filter(project=project)
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{project.name}_report.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="{project.project_name}_report.pdf"'
 
     # Create a PDF document
     buffer = response
@@ -259,10 +259,10 @@ def project_report(request, project_id):
     # Styles
     styles = getSampleStyleSheet()
     # Title
-    elements.append(Paragraph(f"Project Report: {project.name}", styles['Title']))
+    elements.append(Paragraph(f"Project Report: {project.project_name}", styles['Title']))
     # Project Details
     project_details = f"""
-    <b>Project Name:</b> {project.name}<br/>
+    <b>Project Name:</b> {project.project_name}<br/>
     <b>Project Code:</b> {project.id}<br/>
     <b>Supervisor:</b> {project.supervisor.get_full_name()}<br/>
     <b>Total Cost:</b> ${project.budget}<br/>
@@ -279,7 +279,7 @@ def project_report(request, project_id):
 
     for task in tasks:
         task_data.append([
-            task.name,
+            task.task_name,
             task.assigned_to.get_full_name(),
             task.due_date.strftime('%Y-%m-%d'),
             task.get_status_display()

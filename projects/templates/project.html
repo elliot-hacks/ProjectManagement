@@ -33,7 +33,7 @@
                         </div>
                         <div class="col-md-8">
                             <div class="project-content mb-4">
-                                <p class="fs-5 text-secondary mb-2" href="{% url 'project_detail' project.id %}">{{ project.name }}</p>
+                                <p class="fs-5 text-secondary mb-2" href="{% url 'project_detail' project.id %}">{{ project.project_name }}</p>
                                 <a href="{% url 'project_detail' project.id %}" class="h4">{{ project.project_code }}</a>
                                 <p class="mb-0 mt-3" href="{% url 'project_detail' project.id %}"   >{{ project.description }}</p>
                             </div>

@@ -85,9 +85,9 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(models.Contructor)
 class ContructorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'office_type', 'location')
-    search_fields = ('name', 'office_type')
-    list_filter = ('office_type',)
+    list_display = ['name', 'office_type', 'location', 'email', 'contructor_attachments']
+    search_fields = ['name', 'office_type']
+    list_filter = ['location']
     list_select_related = ['location']
     autocomplete_fields = ['location']
     list_per_page = 10

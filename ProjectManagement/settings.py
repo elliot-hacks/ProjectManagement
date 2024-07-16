@@ -65,7 +65,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ProjectManagement.wsgi.application'
 
 
-if DEBUG:
+if DEBUG == True:
+    SECRET_KEY = 'django-insecure-suhx)$#ur!*7yao!drutg^t_u&=_!ucp@#118f#^_-urs&2xl('
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

@@ -1,9 +1,11 @@
 from pathlib import Path
 import os
-
+import pymysql
+pymysql.install_as_MySQLdb()
+    
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-suhx)$#ur!*7yao!drutg^t_u&=_!ucp@#118f#^_-urs&2xl('
+# SECRET_KEY = 'django-insecure-suhx)$#ur!*7yao!drutg^t_u&=_!ucp@#118f#^_-urs&2xl('
 
 DEBUG = True
 
@@ -19,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     # 'admin_tools',
     # 'admin_tools.dashboard',
@@ -32,6 +35,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,12 +65,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ProjectManagement.wsgi.application'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    SECRET_KEY = os.environ['SECRET_KEY']
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['myDB'],
+            'PORT': 3306,
+            'HOST': 'localhost',
+            'USER': os.environ['myUser'],
+            'PASSWORD': os.environ['myPass'],
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -94,12 +111,10 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "projects/static/")
-]
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

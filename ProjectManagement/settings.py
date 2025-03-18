@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     # 'admin_tools.utils',
     'projects',
     'channels',
-    'schedule',
+    # 'schedule',
 ]
 
 MIDDLEWARE = [

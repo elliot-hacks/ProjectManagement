@@ -9,3 +9,9 @@ django-suit-dashboard>=2.0.6
 channels
 pymysql
 whitenoise
+reportlab
+pillow
+pandas
+numpy
+matplotlib
+plotly
